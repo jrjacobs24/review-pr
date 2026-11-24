@@ -180,19 +180,13 @@ This paragraph anchors every reviewer. If the PR description is thin or contradi
 
 Launch all reviewers in a single message using the Task tool, so they run in parallel.
 
-**Model selection.** Read `~/.cursor/rules/pstack-models.mdc` if it exists. Use the `review-pr reviewers` line if present; otherwise use its `interrogate reviewers` line; otherwise fall back to this table. One reviewer per configured entry — extend or shrink the Reviewer A/B/C labels to match the entry count.
-
-| Subagent | Default model |
-|----------|---------------|
-| Reviewer A | `claude-opus-5-5-high` |
-| Reviewer B | `gpt-5.6-sol-high` |
-| Reviewer C | `grok-4.7-high` |
+**Model selection.** Use the `interrogate reviewers` line in `~/.cursor/rules/pstack-models.mdc`. Spawn one reviewer per entry, labeled Reviewer A, B, and so on to match the entry count. If the file or that line is missing, stop and ask the user to run `/setup-pstack`.
 
 The adversarial signal comes from model diversity, not from assigned personas. Give every reviewer the same prompt and rubric. Keep every model on this panel. This is a cross-reference pass, so do not collapse it to the parent model or to the single work model.
 
 For each reviewer:
 - `subagent_type`: `generalPurpose`
-- `model`: the configured entry, or the table default
+- `model`: the configured entry
 - `run_in_background`: `false`
 
 If a configured value is `inherit-parent` or `auto`, omit `model` entirely. Those are aliases, not broken slugs.
@@ -210,7 +204,7 @@ Reviewers explore the working copy read-only. The prompt template instructs them
 
 ## Step 6: Synthesize
 
-Spawn one `generalPurpose` verifier and wait for it. Set `model` to the `bug-fix` line in `~/.cursor/rules/pstack-models.mdc`. If that line is missing, use `grok-4.7-high`. This is the work pass. It reads the working copy and the reviewer findings. It does not write the review the user sees, and it does not modify files.
+Spawn one `generalPurpose` verifier and wait for it. Set `model` to the `bug-fix` line in `~/.cursor/rules/pstack-models.mdc`. If that line is missing, use `claude-opus-5-5-medium`. This is the work pass. It reads the working copy and the reviewer findings. It does not write the review the user sees, and it does not modify files.
 
 The verifier returns:
 

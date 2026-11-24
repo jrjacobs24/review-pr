@@ -19,7 +19,7 @@ Several reviewer subagents on different models review the PR against a real loca
 
 - The reviewer prompt, rubric, code-quality lens, and lead-judgment framework are adapted from pstack's `interrogate` skill.
 - Every draft comment goes through pstack's `unslop` skill so it reads like a person wrote it.
-- The reviewer panel and verifier models come from `~/.cursor/rules/pstack-models.mdc`, which `/setup-pstack` writes. Without that file the skill falls back to a hardcoded default panel.
+- The reviewer panel comes from the `interrogate reviewers` line in `~/.cursor/rules/pstack-models.mdc`, which `/setup-pstack` writes. The verifier uses its `bug-fix` line.
 
 **[code-review-excellence](https://www.skills.sh/wshobson/agents/code-review-excellence)** (required). This skill's feedback approach and tone guidance build on it.
 
@@ -59,12 +59,6 @@ Several reviewer subagents on different models review the PR against a real loca
 
    ```bash
    gh auth status
-   ```
-
-6. Optional: give this skill its own reviewer panel by adding a line to `~/.cursor/rules/pstack-models.mdc`. Without it, the skill uses the `interrogate reviewers` line.
-
-   ```
-   review-pr reviewers: claude-opus-5-5-high, gpt-5.6-sol-high, grok-4.7-high
    ```
 
 ## Usage
