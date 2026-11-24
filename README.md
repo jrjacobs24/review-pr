@@ -1,6 +1,6 @@
 # review-pr
 
-A Cursor Agent Skill for reviewing other people's pull requests.
+A Cursor Agent Skill for reviewing other people's pull requests, and for self-reviewing your own.
 
 Several reviewer subagents on different models review the PR against a real local checkout. A lead reviewer filters their findings, and the survivors become short, human-sounding draft comments. Nothing is posted until you approve it.
 
@@ -12,6 +12,7 @@ Several reviewer subagents on different models review the PR against a real loca
 - Builds a Cursor Canvas when there are more than three feedback items. The canvas has editable drafts, the summary comment, the verdict, and a preview of exactly what would be posted.
 - Never posts a comment or submits a review without your explicit permission. Permission covers one action and expires when that action completes.
 - Cleans up its worktree when you send `COMPLETE CODE REVIEW`.
+- Self-reviews your own PRs. The review is the same, but the output is a markdown report instead of draft comments, and nothing goes to GitHub (see Self-review below).
 
 ## Requirements
 
@@ -78,6 +79,18 @@ COMPLETE CODE REVIEW
 ```
 
 This removes any review worktree the skill created. It doesn't publish anything, and it asks what to do with any drafts that haven't been posted.
+
+### Self-review
+
+Point the skill at a PR you authored, and it switches to a self-review automatically. You can also ask for one explicitly. Run it in a fresh chat, not the one where you built the PR, so the review starts without the implementation's assumptions.
+
+The skill runs the same reviewer panel and filtering, then writes a report to `~/.cursor/reviews/<repo>/pr-<number>-self-review.md`. The report opens with instructions for the agent that implemented the PR. Each finding has a stable ID, a severity, context to help you understand the code, and an evidence trace the agent can check. The report ends with a few takeaways.
+
+To use the report:
+
+1. Read it yourself.
+2. Attach it in the chat where the PR was implemented. That agent decides what to address and records `Addressed` or `Declined` on each finding.
+3. Optionally, run another round. The skill reviews only the new commits, verifies the addressed findings, and leaves declined ones alone.
 
 ## Credits
 

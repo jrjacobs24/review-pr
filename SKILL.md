@@ -1,6 +1,6 @@
 ---
 name: review-pr
-description: Deeply review someone else's pull request by spawning multiple independent multi-model reviewers against a local working copy, then synthesizing their findings into constructive, severity-labeled feedback tracked on a canvas alongside editable draft comments. Use when reviewing a PR, given a GitHub PR link to review, or when the user asks for a thorough, grounded, or multi-model review of a pull request.
+description: Deeply review a pull request by spawning multiple independent multi-model reviewers against a local working copy, then synthesizing their findings. For someone else's PR, the findings become constructive draft comments tracked on a canvas. For the user's own PR, a self-review produces a markdown report to read and hand to the implementing agent. Use when reviewing a PR, given a GitHub PR link to review, asked to self-review a PR, or asked for a thorough, grounded, or multi-model review of a pull request.
 disable-model-invocation: true
 mode: true
 icon: git-pull-request
@@ -10,6 +10,8 @@ color: purple
 # Review PR
 
 Review a pull request authored by someone else. Thoroughness comes from spawning several reviewers across different models against a real local checkout; the delivered feedback is constructive, prioritized, and written for the PR author to read.
+
+When the PR is the user's own, run a **self-review** instead. It's the same review with a different deliverable: a markdown report for the user to learn from and hand to the agent that implemented the PR. See Self-Review below.
 
 ## IMPORTANT
 
@@ -24,6 +26,14 @@ Review a pull request authored by someone else. Thoroughness comes from spawning
 
 When in doubt, ask again. Asking twice costs a turn. Posting something unapproved costs trust.
 
+**A self-review never publishes anything**, with or without permission. If the user asks to post from a self-review, confirm that they want to switch to a normal review first.
+
+## Self-Review
+
+Run a self-review when the PR's author is the authenticated `gh` user (Step 1 checks this), or when the user asks for one. Say which mode you're in before spawning reviewers, so the user can correct it.
+
+Steps 1 through 7 run unchanged. A self-review is not a lighter review. Steps 8 and 9 are replaced by `references/self-review.md`, which defines the report file, where it lives, and how later rounds update it. Step 10 still applies. There's no canvas, no draft comment, no summary note, and no verdict.
+
 ## The Three Texts
 
 Every finding ends up written three times, for three audiences. Do not blend them.
@@ -37,6 +47,8 @@ Every finding ends up written three times, for three audiences. Do not blend the
 The adversarial pass finds things. The context pass helps the user judge them. The draft comment communicates them to someone already fluent in the code.
 
 The most common failure is letting these collapse into one: pasting reviewer evidence into a comment, or explaining the codebase to the person who wrote it. The author gets the short version. The user gets the explanation.
+
+A self-review has no draft comment. Its report carries the review context for the user, plus a short evidence trace for the implementing agent, in separate labeled parts of each finding.
 
 ## Running as a Mode
 
@@ -53,6 +65,7 @@ Two consequences follow from a session that outlives any single turn.
 | Feedback items, drafts, statuses | The canvas `.canvas.data.json` sidecar |
 | What's already posted | `gh pr view <pr> --comments` — authoritative, beats any local record |
 | Commit the review covered | `reviewedSha` in the canvas state |
+| Self-review findings, statuses, commit covered | The report file's Status lines and frontmatter |
 
 Record the reviewed head SHA in canvas state as soon as the canvas exists. It's what makes incremental re-review possible.
 
@@ -94,8 +107,8 @@ Review Progress:
 - [ ] Step 5: Spawn reviewers
 - [ ] Step 6: Synthesize
 - [ ] Step 7: Lead judgment
-- [ ] Step 8: Deliver feedback (canvas if >3 items)
-- [ ] Step 9: Publish (only on explicit permission)
+- [ ] Step 8: Deliver feedback (canvas if >3 items; self-review: write the report)
+- [ ] Step 9: Publish (only on explicit permission; self-review: never)
 - [ ] Step 10: Teardown on "COMPLETE CODE REVIEW"
 ```
 
@@ -113,6 +126,14 @@ Resolve the PR's metadata in one call:
 gh pr view <pr> --json number,title,body,url,author,headRefName,baseRefName,isCrossRepository,additions,deletions,changedFiles,statusCheckRollup,reviewDecision
 ```
 
+Then check whether this is the user's own PR:
+
+```bash
+gh api user --jq .login
+```
+
+If it matches `author.login`, this is a self-review.
+
 ## Step 2: Establish a local working copy
 
 Reviewers must read the real codebase, not just a diff. A diff alone hides callers, callees, types, and sibling modules — which is exactly where the substantive findings live.
@@ -125,6 +146,8 @@ git status --short
 ```
 
 **If the PR's `headRefName` is the current branch**, confirm it's current with the remote (`git log --oneline -1` against `gh pr view <pr> --json headRefOid`) and use the existing working directory. Continue to Step 3.
+
+In a self-review, the current branch is often the one the implementing agent is still working in. If that tree is dirty or ahead of the PR head, the reviewers would be reading unpushed work, and another chat may still be editing those files. Point this out and offer a worktree on the PR head instead.
 
 **If it is not checked out, ask permission before touching the repository state.** Present both options without recommending one, and include the tradeoff that applies right now — specifically whether the working tree is dirty, since that determines how disruptive an in-place checkout would be:
 
@@ -234,6 +257,8 @@ Keep "Act on" short. More than five items usually means you haven't filtered har
 **Default the verdict to neither approve nor request changes.** Leaving comments and withholding approval is the normal outcome and carries plenty of signal. Reserve Request Changes for that same verifiable-bug bar; reserve Approve for changes that are genuinely fine, which nits don't disqualify. When you land in the middle, name what's holding you back in the relevant line comment and reference it in the summary note. `references/lead-judgment.md` has the full ladder.
 
 ## Step 8: Deliver feedback
+
+**In a self-review, skip this step and Step 9.** Read `references/self-review.md` and write the report it describes. The `unslop` locator below still applies.
 
 Read `references/feedback-style.md` and apply it to every finding you're keeping. It governs severity labels, length, collaborative phrasing, and the human-tone pass.
 
@@ -402,7 +427,7 @@ If `git worktree remove` reports uncommitted changes, do not force it. Show the 
 
 If the branch was checked out in place instead, no cleanup is needed. Ask whether they want to return to their previous branch; don't switch on your own.
 
-**Leave the canvas in place.** It lives outside the worktree, so removing the worktree doesn't touch it, and it's the durable record of what was raised and what was posted. Note that its jump-to-code controls stop working once a worktree is removed, and offer to delete it — don't delete it unprompted.
+**Leave the canvas in place.** It lives outside the worktree, so removing the worktree doesn't touch it, and it's the durable record of what was raised and what was posted. Note that its jump-to-code controls stop working once a worktree is removed, and offer to delete it — don't delete it unprompted. The same goes for a self-review report. The implementing agent may still be working from it.
 
 Confirm what was removed.
 
@@ -414,3 +439,4 @@ Confirm what was removed.
 - `references/lead-judgment.md` — how to filter reviewer findings
 - `references/feedback-style.md` — author-facing tone, severity labels, and comment templates
 - `references/canvas-review.md` — feedback-tracker canvas structure and state handling
+- `references/self-review.md` — the self-review report, its location, and re-review rounds
