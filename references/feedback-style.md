@@ -151,7 +151,7 @@ Include a concrete code snippet when you have one. A suggestion the author can a
 
 ## Sounding Human
 
-Run every draft comment through the **`unslop`** skill before showing it. Locate its `SKILL.md` under `~/.cursor/plugins/` if it isn't offered directly. Apply the same pass to the review prose you write for the user.
+Run every draft comment through the **`unslop`** skill before showing it. It's in the pstack plugin and won't show up in your skill list; Step 8 of `SKILL.md` has the command that finds it. Apply the same pass to the review prose you write for the user.
 
 A comment that reads as machine-generated gets discounted on sight, no matter how good the finding is.
 

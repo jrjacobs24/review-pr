@@ -160,7 +160,7 @@ Two audiences share this canvas, so keep their text distinct:
 - **Draft comments** are author-facing and get posted verbatim. Apply `feedback-style.md`: collaborative, specific, and short. One to three sentences, with no severity label in the text beyond a lowercase `nit:` prefix where it applies.
 - **Your commentary** — orientation, section notes, callouts, the overview — is for the user. Explain what the code does, why something changed, and how files interact. Not what the diff already shows.
 
-Run both through the `unslop` skill, keeping the exemption `feedback-style.md` names for the Communication artifacts rules (20 and 22).
+Run both through the `unslop` skill (Step 8 of `SKILL.md` shows how to find it), keeping the exemption `feedback-style.md` names for the Communication artifacts rules (20 and 22).
 
 The severity pill lives in the tracker chrome, not in the draft field. That separation is the point: the user gets the at-a-glance triage marker, and the author gets prose that doesn't look generated.
 

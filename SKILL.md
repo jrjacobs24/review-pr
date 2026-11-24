@@ -243,6 +243,14 @@ Three rules do the heavy lifting here:
 
 **Make them sound human.** Run every draft through the `unslop` skill, and the review prose you write for the user too. One deliberate exemption: the Communication artifacts rules (20 and 22) don't apply, because collaborative sign-offs and genuine praise are how real reviewers write.
 
+`unslop` ships in the pstack plugin and won't appear in your skill list, because it sets `disable-model-invocation: true`. Read it directly. The install path includes a commit hash that changes on every pstack update, so resolve it with a glob rather than a fixed path:
+
+```bash
+ls -t ~/.cursor/plugins/cache/*/pstack/*/skills/unslop/SKILL.md | head -1
+```
+
+Read the file that command prints. If it prints nothing, pstack isn't installed: tell the user once, then apply the tells listed under "Sounding Human" in `references/feedback-style.md` as a fallback.
+
 **Posted comments carry no severity label.** No emoji, no `[blocking]`, no `[important]`, and no invented substitute. The one exception is a lowercase `nit:` prefix for genuinely trivial items. Everything else conveys its stakes in the prose: state the concrete consequence for a blocker, say "not blocking" outright for an optional, ask a question when it's a question. Severity still drives the ordering in the review below, the canvas pills, and the verdict you recommend. It just never gets stamped onto the text the author reads.
 
 **Give the user context the author doesn't need.** Assume the user hasn't read the diff and may not know this area of the codebase. Explain what the affected code does and how it's reached, so they can judge each finding rather than take it on faith. This context goes in the review you present and in the canvas. It never goes in the draft comment.
