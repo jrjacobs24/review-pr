@@ -84,7 +84,7 @@ This removes any review worktree the skill created. It doesn't publish anything,
 
 Point the skill at a PR you authored, and it switches to a self-review automatically. You can also ask for one explicitly. Run it in a fresh chat, not the one where you built the PR, so the review starts without the implementation's assumptions.
 
-The skill runs the same reviewer panel and filtering, then writes a report to `~/.cursor/reviews/<repo>/pr-<number>-self-review.md`. The report opens with instructions for the agent that implemented the PR. Each finding has a stable ID, a severity, context to help you understand the code, and an evidence trace the agent can check. The report ends with a few takeaways.
+The skill runs the same reviewer panel and filtering, then writes a report to `~/.cursor/reviews/<repo>/pr-<number>-self-review.md`. The report opens with instructions for the agent that implemented the PR. Each finding has a stable ID (`B1`, `C2`, `S1`), a severity, context to help you understand the code, and an evidence trace the agent can check. The report ends with a few takeaways.
 
 To use the report:
 

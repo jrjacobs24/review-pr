@@ -76,7 +76,10 @@ change does to it. Name the entry points and key files.>
 
 ## Findings
 
-### F1. <Short title>
+### <ID>. <Short title>
+
+IDs follow "Item IDs" in `SKILL.md`: `B` for Blocking, `C` for Should fix, `S`
+for Consider. For example, `B1`, then `C1`, `C2`, then `S1`.
 
 - Severity: <Blocking | Should fix | Consider>
 - Location: `<path>:<line>`
@@ -94,23 +97,23 @@ input traced to the wrong output, or a short snippet.>
 **Suggested direction.** <What would fix it, if there's a clear option. Leave
 this out rather than guess.>
 
-### F2. <Short title>
+### <ID>. <Short title>
 
 ...
 
 ## Open questions
 
 <Things the code alone couldn't settle, where the implementing agent likely
-knows the answer. Number them Q1, Q2.>
+knows the answer. One line each, with IDs Q1, Q2.>
 
 ## Noted
 
-<Nits and low-priority observations. One line each, numbered N1, N2.>
+<Nits and low-priority observations. One line each, with IDs N1, N2.>
 
 ## Dismissed
 
 <Findings the panel raised that didn't hold up, one line each with the reason.
-Numbered D1, D2. The user can overturn any of them.>
+IDs D1, D2. The user can overturn any of them.>
 
 ## Takeaways
 
@@ -138,10 +141,10 @@ The "Noted" bucket goes in Noted, and "Dismissed" goes in Dismissed. Order Findi
 
 The two readers want different things from the same entry. The context lines are for the user; the evidence is for the agent. Keep them in their own labeled parts so neither reader has to dig.
 
-- **IDs are stable.** The user and the agent will refer to findings as "F3" across chats. Never renumber, even when a later round resolves or adds findings.
+- **IDs are stable.** The user and the agent will refer to findings as "C2" across chats, so the rules in "Item IDs" in `SKILL.md` matter most here. Never renumber, even when a later round resolves or adds findings.
 - **Evidence is a trace, not a story.** "`useSubmit` calls `submitOrder` from the `onPress` at `checkout.tsx:88` with no in-flight guard, so a double tap sends two requests." Not a paragraph about how you found it.
 - **Suggested direction is a direction.** The implementing agent decides how to fix it. Point at the fix; don't write the patch.
-- **Takeaways are for learning, so make them specific.** "Debounce or guard any handler that fires a non-idempotent request (F1)" teaches something. "Think about edge cases" doesn't.
+- **Takeaways are for learning, so make them specific.** "Debounce or guard any handler that fires a non-idempotent request (C1)" teaches something. "Think about edge cases" doesn't.
 - Run all prose through `unslop`.
 
 ## Re-review
@@ -151,7 +154,7 @@ The user may run another round after the implementing agent has worked through t
 1. Review only the delta from `reviewed_sha` to the current head, using the same commands as Resuming in `SKILL.md`.
 2. For each `Addressed` finding, check that the delta really fixes it. Mark it `Resolved in <commit>` if so. If the fix is incomplete, leave it open and add a sentence saying what's still missing.
 3. Leave `Declined` findings alone. If the panel raises the same point again, don't reopen it. The user can reopen it themselves.
-4. Append new findings, continuing the numbering.
+4. Append new findings, continuing each prefix's numbering from the highest ID used.
 5. Update `reviewed_sha`, `reviewed_at`, `round`, and the Readiness call.
 
 ## In chat

@@ -58,6 +58,7 @@ Each entry carries:
 
 | Part | Purpose |
 |---|---|
+| ID | The item's ID (`B1`, `C2`, `S1`, ...) from "Item IDs" in `SKILL.md`, shown beside the title. It's what the user types in chat to refer to the item. Canvas only; never inside the draft comment text |
 | Severity | 🔴 blocking / 🟡 important / 🟢 nit / 💡 suggestion / ❓ question — as a `Pill`, tone-matched. Canvas only; never inside the draft comment text |
 | Location | `file:line`, with a jump-to-code control (see below) |
 | What this code does | One or two sentences of orientation **for the user**, not the author |
@@ -80,7 +81,7 @@ Order by severity, blocking first. Group by severity or by file, whichever makes
 
 Render each draft comment in a `TextArea` bound to persistent state, not as static `Text`. The user proofreads every comment before anything is posted, and editing in place beats dictating changes back through chat.
 
-Hold all item state in a single `useCanvasState` entry keyed by finding id — one object, not a hook per item:
+Hold all item state in a single `useCanvasState` entry keyed by the item ID (`"B1"`, `"S2"`) — one object, not a hook per item. Use the same IDs the chat review shows, so "drop S2" in chat maps to one key:
 
 ```tsx
 type ItemStatus = "include" | "drop" | "posted" | "resolved";
@@ -149,7 +150,7 @@ Use both sparingly. Straightforward changes don't need a pseudocode mirror, and 
 
 ## Dismissed Findings
 
-Include them, collapsed, with the one-line rationale for each. Same trust mechanism as the markdown review: the user can see what you rejected and overturn it. Collapsed because it's reference material, not the main event.
+Include them, collapsed, with each one's `D` ID and a one-line rationale. Same trust mechanism as the markdown review: the user can see what you rejected and overturn it. Collapsed because it's reference material, not the main event.
 
 Give each a control to promote it back into the tracker if the user disagrees — a dismissed finding the user wants is otherwise a full round-trip through chat.
 

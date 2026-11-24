@@ -50,6 +50,26 @@ The most common failure is letting these collapse into one: pasting reviewer evi
 
 A self-review has no draft comment. Its report carries the review context for the user, plus a short evidence trace for the implementing agent, in separate labeled parts of each finding.
 
+## Item IDs
+
+Every item in the review gets a short ID, so the user can say "drop S2" or "explain B1" in this chat, and so a self-review's findings can be cited in another chat. The prefix says which section the item sits in:
+
+| Prefix | Section | Self-review severity |
+|--------|---------|----------------------|
+| `B` | Blocking: the rare traced user-facing bug or breaking change | Blocking |
+| `C` | Main Concerns that aren't blocking (the rest of "Act on") | Should fix |
+| `S` | Suggestions (the "Consider" bucket) | Consider |
+| `Q` | Questions | Open questions |
+| `N` | Noted | Noted |
+| `D` | Dismissed | Dismissed |
+
+Number each prefix from 1, in the order the items appear.
+
+- **Assign IDs once, in Step 8**, after lead judgment has settled the buckets. Reviewers never see them.
+- **IDs are permanent.** Never renumber and never reuse one, even after an item is resolved, dropped, or moved. If the user promotes a dismissed item or you change an item's severity, it keeps its ID even though the prefix no longer matches, because renaming breaks every reference already made. A later round continues from the highest number used for each prefix.
+- **Show the ID wherever the item appears**: its heading in chat, the canvas tracker, the dismissed list, and the self-review report. Write it as `B1`, followed by the title.
+- **Keep IDs out of anything the author reads.** No draft comment, summary note, or published review mentions them. The author has never seen the numbering, and "see S2" on a PR is noise.
+
 ## Running as a Mode
 
 This skill is built to run as a Custom Mode, pinned for a whole review session, because a real review is a conversation: present findings, the user edits drafts, they grant permission for some of them, the author pushes a fix, repeat. Activate it from the `/` menu with Option+Enter, or "Use as Mode" on the skill entry.
@@ -62,7 +82,7 @@ Two consequences follow from a session that outlives any single turn.
 |---|---|
 | Which PR | The canvas filename, or the review worktree's branch name |
 | Working copy path | `git worktree list --porcelain` |
-| Feedback items, drafts, statuses | The canvas `.canvas.data.json` sidecar |
+| Feedback items, IDs, drafts, statuses | The canvas `.canvas.data.json` sidecar |
 | What's already posted | `gh pr view <pr> --comments` — authoritative, beats any local record |
 | Commit the review covered | `reviewedSha` in the canvas state |
 | Self-review findings, statuses, commit covered | The report file's Status lines and frontmatter |
@@ -87,7 +107,7 @@ Spawn reviewers on that diff, with the original intent plus a note on what chang
 
 Merge the results into the existing tracker rather than rebuilding it:
 
-- New findings get appended.
+- New findings get appended, with IDs continuing from the highest used for each prefix (see Item IDs).
 - Items the new commits fixed get marked resolved, not deleted. The user should see that a concern was raised and addressed.
 - Items the user already dropped stay dropped. Don't resurrect them because a reviewer raised them again.
 - Update `reviewedSha` to the new head.
@@ -304,9 +324,10 @@ not know this area. Four to six sentences.]
 [What was genuinely done well. Not filler — if there's nothing notable, omit the section.]
 
 ### Main Concerns
-[The "Act on" bucket: what you want the author to address. Mark the rare true
-blocker with 🔴 and say why it clears that bar; everything else here is
-important but not blocking. For each, in this order:
+[The "Act on" bucket: what you want the author to address. Heading each item
+with its ID and title, like `#### C1. Missing guard on empty cart`. Give the
+rare true blocker a `B` ID and 🔴, and say why it clears that bar; everything
+else here is important but not blocking. For each, in this order:
   - **What this code does** — one or two sentences of context for the user.
   - **The concern** — what's wrong and what it causes.
   - **Draft comment** — the short author-facing text, quoted so it's obvious
@@ -314,16 +335,16 @@ important but not blocking. For each, in this order:
   - Which models raised it.]
 
 ### Suggestions
-[🟡 important and 💡 suggestion items. Same shape, plus the tradeoff.]
+[🟡 important and 💡 suggestion items, IDs S1, S2, and so on. Same shape, plus the tradeoff.]
 
 ### Questions
-[❓ genuine clarifications where the code is ambiguous and the author knows something you don't.]
+[❓ genuine clarifications where the code is ambiguous and the author knows something you don't. IDs Q1, Q2, and so on.]
 
 ### Noted
-[🟢 nits and low-priority observations. Brief list. These rarely need context.]
+[🟢 nits and low-priority observations, IDs N1, N2, and so on. Brief list. These rarely need context.]
 
 ### Dismissed
-[Findings you rejected, with one-line rationale each. This is a trust mechanism — it lets the user override your judgment.]
+[Findings you rejected, IDs D1, D2, and so on, with one-line rationale each. This is a trust mechanism — it lets the user override your judgment.]
 
 ### Agreement Map
 [Where models converged, where they diverged, and what that pattern says about the change.]
